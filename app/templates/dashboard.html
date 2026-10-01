@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section dashboard-hero">
+  <div class="dashboard-top reveal">
+    <div>
+      <span class="eyebrow">Your personalized plan</span>
+      <h1>{{ user.name }}</h1>
+      <p>Goal: {{ user.goal }} · Intensity: {{ user.intensity }} · Weight: {{ user.weight }} kg · Age: {{ user.age }}</p>
+    </div>
+    <div class="progress-ring" style="--progress: {{ completed_count }};">
+      <div>
+        <strong>{{ completed_count }}/{{ total_count }}</strong>
+        <span>completed</span>
+      </div>
+    </div>
+  </div>
+
+  {% if message %}
+  <div class="success-banner reveal" role="status">{{ message }}</div>
+  {% endif %}
+
+  {% if current_plan %}
+  <div class="panel-grid">
+    <article class="glass-card reveal">
+      <div class="card-header">
+        <div>
+          <span class="eyebrow">Current version</span>
+          <h2>Plan v{{ current_plan.version }}</h2>
+        </div>
+        <span class="pill">{{ current_plan.plan_type|capitalize }}</span>
+      </div>
+      <p>{{ current_plan.plan_data.title }}</p>
+      <div class="nutrition-card compact">
+        <strong>AI Nutrition & Recovery Tip</strong>
+        <p>{{ current_plan.nutrition_tip.tip }}</p>
+        <small>{{ current_plan.nutrition_tip.why_it_matters }}</small>
+        <small>{{ current_plan.nutrition_tip.practical_action }}</small>
+      </div>
+    </article>
+
+    <article class="glass-card reveal">
+      <span class="eyebrow">Weekly completion</span>
+      <div class="mini-progress">
+        <div style="width: {{ (completed_count / total_count * 100) if total_count else 0 }}%;"></div>
+      </div>
+      <p>Mark workouts complete locally to track your week.</p>
+    </article>
+  </div>
+
+  <section class="day-grid" data-plan-id="{{ current_plan.id }}">
+    {% for day in current_plan.plan_data.days %}
+    <article class="day-card reveal" data-day-card data-day-number="{{ day.day }}">
+      <button class="day-toggle" type="button" data-day-toggle aria-expanded="false">
+        <div>
+          <span class="day-label">DAY {{ '%02d'|format(day.day) }}</span>
+          <h3>{{ day.focus }}</h3>
+        </div>
+        <span class="chevron">+</span>
+      </button>
+      <div class="day-body" hidden>
+        <div class="detail-list">
+          <div><strong>Warm-up</strong><span>{{ day.warmup|join(' · ') }}</span></div>
+          <div><strong>Exercises</strong>
+            <ul>
+              {% for exercise in day.exercises %}
+              <li>
+                <strong>{{ exercise.name }}</strong>
+                <span>
+                  {% if exercise.sets %}{{ exercise.sets }} sets{% endif %}
+                  {% if exercise.reps is not none %} · {{ exercise.reps }} reps{% endif %}
+                  {% if exercise.duration_minutes is not none %} · {{ exercise.duration_minutes }} min{% endif %}
+                  · Rest {{ exercise.rest_seconds }} sec
+                </span>
+                {% if exercise.notes %}<small>{{ exercise.notes }}</small>{% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div><strong>Cooldown</strong><span>{{ day.cooldown|join(' · ') }}</span></div>
+          <div><strong>Recovery</strong><span>{{ day.recovery_tip }}</span></div>
+        </div>
+        <div class="day-actions">
+          <label class="checkbox-row">
+            <input type="checkbox" data-complete-day value="{{ day.day }}">
+            <span>Mark complete</span>
+          </label>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="feedback-panel reveal">
+    <div>
+      <span class="eyebrow">Feedback</span>
+      <h2>Make your plan fit you better</h2>
+      <p>Examples: add more cardio, reduce intensity, include yoga, or add rest days.</p>
+    </div>
+    <form class="glass-form compact" method="post" action="/submit-feedback" data-loading-form>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="user_id" value="{{ user.user_id }}">
+      <label>
+        <span>Your feedback</span>
+        <textarea name="feedback_text" rows="5" maxlength="1000" required data-feedback-input placeholder="Add more cardio and make the leg day less intense."></textarea>
+      </label>
+      <div class="char-count" data-char-count>0 / 1000</div>
+      <button class="button button-primary" type="submit">Adapt My Plan</button>
+    </form>
+  </section>
+
+  <section class="history-preview reveal">
+    <div class="section-heading">
+      <span class="eyebrow">History</span>
+      <h2>Versioned plan history</h2>
+    </div>
+    <div class="history-list">
+      {% for item in history %}
+      <article class="history-card">
+        <div class="history-meta">
+          <strong>Plan v{{ item.plan.version }}</strong>
+          <span>{{ item.plan.created_at }}</span>
+        </div>
+        <p>{{ item.plan.plan_data.title }}</p>
+        {% if item.feedback %}<small>Feedback: {{ item.feedback }}</small>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    <a class="button button-secondary" href="/history/{{ user.user_id }}">View full history</a>
+  </section>
+  {% endif %}
+</section>
+{% endblock %}

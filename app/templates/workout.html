@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section dashboard-hero">
+  <div class="dashboard-top reveal">
+    <div>
+      <span class="eyebrow">Workout detail</span>
+      <h1>Your Personalized Plan</h1>
+      <p>{{ user.name }} · {{ user.goal }} · {{ user.intensity }} · {{ user.weight }} kg · {{ user.age }} years</p>
+    </div>
+    <div class="version-chip">Plan v{{ current_plan.version }}</div>
+  </div>
+  <div class="panel-grid">
+    <article class="glass-card reveal">
+      <h2>{{ current_plan.plan_data.title }}</h2>
+      <p>{{ current_plan.plan_data.goal }} · {{ current_plan.plan_data.intensity }}</p>
+    </article>
+    <article class="glass-card reveal">
+      <strong>AI Nutrition & Recovery Tip</strong>
+      <p>{{ current_plan.nutrition_tip.tip }}</p>
+      <small>{{ current_plan.nutrition_tip.why_it_matters }}</small>
+      <small>{{ current_plan.nutrition_tip.practical_action }}</small>
+    </article>
+  </div>
+  <section class="day-grid" data-plan-id="{{ current_plan.id }}">
+    {% for day in current_plan.plan_data.days %}
+    <article class="day-card reveal" data-day-card data-day-number="{{ day.day }}">
+      <button class="day-toggle" type="button" data-day-toggle aria-expanded="false">
+        <div>
+          <span class="day-label">DAY {{ '%02d'|format(day.day) }}</span>
+          <h3>{{ day.focus }}</h3>
+        </div>
+        <span class="chevron">+</span>
+      </button>
+      <div class="day-body" hidden>
+        <div class="detail-list">
+          <div><strong>Warm-up</strong><span>{{ day.warmup|join(' · ') }}</span></div>
+          <div><strong>Exercises</strong>
+            <ul>
+              {% for exercise in day.exercises %}
+              <li>
+                <strong>{{ exercise.name }}</strong>
+                <span>{% if exercise.sets %}{{ exercise.sets }} sets{% endif %}{% if exercise.reps is not none %} · {{ exercise.reps }} reps{% endif %}{% if exercise.duration_minutes is not none %} · {{ exercise.duration_minutes }} min{% endif %} · Rest {{ exercise.rest_seconds }} sec</span>
+                {% if exercise.notes %}<small>{{ exercise.notes }}</small>{% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div><strong>Cooldown</strong><span>{{ day.cooldown|join(' · ') }}</span></div>
+          <div><strong>Recovery</strong><span>{{ day.recovery_tip }}</span></div>
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" data-complete-day value="{{ day.day }}">
+          <span>Mark complete</span>
+        </label>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+</section>
+{% endblock %}

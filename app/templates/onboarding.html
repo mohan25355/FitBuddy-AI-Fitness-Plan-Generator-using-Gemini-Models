@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section onboarding-grid">
+  <div class="section-heading reveal">
+    <span class="eyebrow">Profile setup</span>
+    <h1>Tell FitBuddy about you.</h1>
+    <p>Enter valid details so the AI can generate a safe and personalized plan.</p>
+  </div>
+
+  <form class="glass-form reveal" method="post" action="/generate-workout" data-loading-form>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="form-grid">
+      <label>
+        <span>Name</span>
+        <input name="name" type="text" required maxlength="120" placeholder="Alex Morgan">
+      </label>
+      <label>
+        <span>User ID</span>
+        <input name="user_id" type="text" required maxlength="80" placeholder="alexm001">
+      </label>
+      <label>
+        <span>Age</span>
+        <input name="age" type="number" required min="10" max="100" placeholder="28">
+      </label>
+      <label>
+        <span>Weight (kg)</span>
+        <input name="weight" type="number" required min="1" step="0.1" placeholder="72.5">
+      </label>
+      <label>
+        <span>Goal</span>
+        <select name="goal" required>
+          <option value="">Select goal</option>
+          <option>Weight Loss</option>
+          <option>Muscle Gain</option>
+          <option>General Wellness</option>
+          <option>Flexibility</option>
+        </select>
+      </label>
+      <label>
+        <span>Intensity</span>
+        <select name="intensity" required>
+          <option value="">Select intensity</option>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+      </label>
+    </div>
+    <p class="disclaimer">FitBuddy provides general fitness guidance and is not a substitute for professional medical advice.</p>
+    <div class="form-actions">
+      <a class="button button-secondary" href="/">Back</a>
+      <button class="button button-primary" type="submit">Generate Plan</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

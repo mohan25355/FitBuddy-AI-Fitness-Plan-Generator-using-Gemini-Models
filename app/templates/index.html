@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero section">
+  <div class="hero-copy reveal">
+    <span class="eyebrow">AI-native fitness planning</span>
+    <h1>Build a personalized 7-day workout plan in minutes.</h1>
+    <p>FitBuddy turns your goal, intensity, and profile into a structured workout plan with nutrition guidance and adaptive feedback.</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="/onboarding">Build My Plan</a>
+      <a class="button button-secondary" href="#how-it-works">See How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <article><strong>7</strong><span>Day plans</span></article>
+      <article><strong>1</strong><span>AI workout call</span></article>
+      <article><strong>Adaptive</strong><span>Feedback loop</span></article>
+    </div>
+  </div>
+  <div class="hero-panel reveal">
+    <div class="preview-card">
+      <div class="preview-header">
+        <span>Weekly overview</span>
+        <span class="pill">Weight Loss</span>
+      </div>
+      <div class="weekly-grid">
+        <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+      </div>
+      <div class="preview-list">
+        <div><strong>Full Body Foundation</strong><span>Warm-up, strength, cooldown</span></div>
+        <div><strong>Cardio + Core</strong><span>Intervals, stability, recovery</span></div>
+        <div><strong>Mobility Reset</strong><span>Flexibility and restoration</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section feature-band" id="ai-planner">
+  <div class="section-heading reveal">
+    <span class="eyebrow">What FitBuddy does</span>
+    <h2>Personalization without the clutter.</h2>
+  </div>
+  <div class="feature-grid">
+    <article class="glass-card reveal"><h3>Goal-aware planning</h3><p>Weight loss, muscle gain, wellness, or flexibility plans adapt to your goal.</p></article>
+    <article class="glass-card reveal"><h3>Intensity matched</h3><p>Low, medium, and high intensity inputs change volume, recovery, and pacing.</p></article>
+    <article class="glass-card reveal"><h3>Adaptive revisions</h3><p>Feedback updates preserve history instead of overwriting previous plans.</p></article>
+  </div>
+</section>
+
+<section class="section" id="how-it-works">
+  <div class="section-heading reveal">
+    <span class="eyebrow">How it works</span>
+    <h2>From profile to plan to revision.</h2>
+  </div>
+  <div class="steps-grid">
+    <article class="step-card reveal"><span>1</span><h3>Enter your profile</h3><p>Share your name, user ID, age, weight, goal, and intensity.</p></article>
+    <article class="step-card reveal"><span>2</span><h3>Generate a structured plan</h3><p>Gemini returns validated JSON for a 7-day routine and nutrition tip.</p></article>
+    <article class="step-card reveal"><span>3</span><h3>Improve with feedback</h3><p>Tell FitBuddy what to change and receive a preserved versioned update.</p></article>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="section-heading reveal">
+    <span class="eyebrow">Features</span>
+    <h2>Designed like a modern fitness SaaS product.</h2>
+  </div>
+  <div class="feature-grid feature-grid-wide">
+    <article class="glass-card reveal"><h3>Server-rendered UX</h3><p>FastAPI and Jinja2 keep the experience reliable and easy to deploy.</p></article>
+    <article class="glass-card reveal"><h3>Plan history</h3><p>Every revision is saved as a versioned plan for comparison and review.</p></article>
+    <article class="glass-card reveal"><h3>Admin dashboard</h3><p>Protected admin access shows users, plans, feedback, and activity.</p></article>
+    <article class="glass-card reveal"><h3>Accessibility-first</h3><p>Keyboard support, labels, focus states, and reduced-motion handling are built in.</p></article>
+  </div>
+</section>
+
+<section class="section split-section">
+  <div class="split-copy reveal">
+    <span class="eyebrow">Adaptive AI</span>
+    <h2>“Add more cardio” becomes a revised plan, not a lost conversation.</h2>
+    <p>Your previous plan stays in history while the new version is created and displayed with version numbers.</p>
+  </div>
+  <div class="split-panel reveal">
+    <div class="quote-card">
+      <p>“Make it easier and include more mobility work.”</p>
+      <span>FitBuddy responds with a new plan v2 while preserving v1.</span>
+    </div>
+  </div>
+</section>
+
+<section class="section split-section reverse">
+  <div class="split-copy reveal">
+    <span class="eyebrow">Nutrition & recovery</span>
+    <h2>Concise guidance that supports the training plan.</h2>
+    <p>Each plan includes a practical nutrition or recovery note focused on hydration, protein, sleep, and sustainable meals.</p>
+  </div>
+  <div class="split-panel reveal">
+    <div class="nutrition-card">
+      <strong>Example tip</strong>
+      <p>Keep protein steady across meals, drink water before training, and include a recovery meal within a few hours after workouts.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section cta-band reveal">
+  <h2>Ready to build your plan?</h2>
+  <p>Generate your first AI fitness routine and start adapting it to your real routine.</p>
+  <a class="button button-primary" href="/onboarding">Build My Plan</a>
+</section>
+{% endblock %}

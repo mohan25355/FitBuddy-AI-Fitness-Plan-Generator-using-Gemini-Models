@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section">
+  <div class="section-heading reveal">
+    <span class="eyebrow">History</span>
+    <h1>Plan history for {{ user.name }}</h1>
+    <p>Compare versions without losing the original plan.</p>
+  </div>
+  <div class="history-list large">
+    {% for item in history %}
+    <article class="history-card reveal">
+      <div class="history-meta">
+        <strong>Plan v{{ item.plan.version }}</strong>
+        <span>{{ item.plan.created_at }}</span>
+      </div>
+      <p>{{ item.plan.plan_data.title }}</p>
+      <div class="mini-meta">Goal: {{ item.plan.plan_data.goal }} · Intensity: {{ item.plan.plan_data.intensity }} · Type: {{ item.plan.plan_type }}</div>
+      {% if item.feedback %}<small>Triggered by: {{ item.feedback }}</small>{% endif %}
+      <div class="form-actions">
+        <a class="button button-secondary" href="/workout/{{ item.plan.id }}">View plan</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

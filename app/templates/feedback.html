@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section">
+  <div class="section-heading reveal">
+    <span class="eyebrow">Feedback</span>
+    <h1>Make your plan fit you better</h1>
+    <p>Use this page to describe what should change in the next version.</p>
+  </div>
+  <form class="glass-form reveal" method="post" action="/submit-feedback" data-loading-form>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="user_id" value="{{ user.user_id }}">
+    <label>
+      <span>Your feedback</span>
+      <textarea name="feedback_text" rows="6" maxlength="1000" required data-feedback-input placeholder="Add more cardio, reduce intensity, and include yoga."></textarea>
+    </label>
+    <div class="char-count" data-char-count>0 / 1000</div>
+    <button class="button button-primary" type="submit">Adapt My Plan</button>
+  </form>
+</section>
+{% endblock %}

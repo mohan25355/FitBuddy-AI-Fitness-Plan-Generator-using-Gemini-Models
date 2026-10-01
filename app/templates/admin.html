@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if login_only %}
+<section class="section admin-section">
+  <div class="section-heading reveal">
+    <span class="eyebrow">Admin access</span>
+    <h1>Protected dashboard</h1>
+    <p>Sign in to review users, plans, history, and feedback.</p>
+  </div>
+  <form class="glass-form reveal" method="post" action="/admin/login" data-loading-form>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label><span>Username</span><input name="username" type="text" required></label>
+    <label><span>Password</span><input name="password" type="password" required></label>
+    <button class="button button-primary" type="submit">Sign In</button>
+  </form>
+</section>
+{% else %}
+<section class="section admin-section">
+  <div class="dashboard-top reveal">
+    <div>
+      <span class="eyebrow">Admin dashboard</span>
+      <h1>Operational overview</h1>
+      <p>Users, plans, updates, and recent activity.</p>
+    </div>
+    <form method="post" action="/admin/logout">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="button button-secondary" type="submit">Logout</button>
+    </form>
+  </div>
+
+  <div class="stat-grid">
+    <article class="glass-card reveal"><strong>{{ total_users }}</strong><span>Total users</span></article>
+    <article class="glass-card reveal"><strong>{{ total_plans }}</strong><span>Total plans</span></article>
+    <article class="glass-card reveal"><strong>{{ updated_plans }}</strong><span>Updated plans</span></article>
+  </div>
+
+  <div class="admin-layout">
+    <section class="glass-card reveal">
+      <h2>Users</h2>
+      <div class="responsive-table">
+        <table>
+          <thead>
+            <tr>
+              <th>User ID</th><th>Name</th><th>Age</th><th>Weight</th><th>Goal</th><th>Intensity</th><th>Created</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ user.user_id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.age }}</td>
+              <td>{{ user.weight }}</td>
+              <td>{{ user.goal }}</td>
+              <td>{{ user.intensity }}</td>
+              <td>{{ user.created_at }}</td>
+              <td>
+                <a href="/dashboard/{{ user.user_id }}">View user</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="glass-card reveal">
+      <h2>Recent activity</h2>
+      <div class="activity-list">
+        {% for item in recent_activity %}
+        <article>
+          <strong>{{ item.kind|capitalize }}</strong>
+          <p>{{ item.label }}</p>
+          <small>{{ item.created_at }}</small>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
