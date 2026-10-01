@@ -129,8 +129,10 @@ label { display: grid; gap: 8px; color: var(--text); }
 label span, .char-count, .disclaimer, .mini-meta, .site-footer p { color: var(--muted); }
 input, select, textarea {
   width: 100%; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: var(--text);
-  padding: 13px 14px; outline: none;
+  padding: 13px 14px; outline: none; color-scheme: dark;
 }
+select option { background: var(--card-strong); color: var(--text); }
+input::placeholder, textarea::placeholder { color: #829087; opacity: 1; }
 input:focus-visible, select:focus-visible, textarea:focus-visible, .button:focus-visible, .day-toggle:focus-visible, a:focus-visible {
   border-color: rgba(149,255,74,0.8); box-shadow: 0 0 0 4px rgba(149,255,74,0.12);
 }
@@ -196,6 +198,7 @@ th { color: var(--muted); font-weight: 600; }
 .loading-overlay {
   position: fixed; inset: 0; background: rgba(4, 7, 5, 0.72); backdrop-filter: blur(14px); display: grid; place-items: center; z-index: 30;
 }
+.loading-overlay[hidden] { display: none !important; }
 .loading-card { min-width: min(92vw, 420px); border-radius: 26px; padding: 28px; text-align: center; }
 .spinner {
   width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.16); border-top-color: var(--accent); animation: spin 1s linear infinite;

@@ -35,49 +35,28 @@
   ];
 
   document.querySelectorAll('[data-loading-form]').forEach((form) => {
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
+    form.addEventListener('submit', () => {
       if (!loadingOverlay) return;
 
       loadingOverlay.hidden = false;
       let step = 0;
-      let interval;
-      let timeout;
-      const controller = new AbortController();
       loadingCopy.textContent = loadingStates[0][0];
       loadingSubcopy.textContent = loadingStates[0][1];
-      interval = window.setInterval(() => {
+      const interval = window.setInterval(() => {
         step += 1;
         const next = loadingStates[Math.min(step, loadingStates.length - 1)];
         loadingCopy.textContent = next[0];
         loadingSubcopy.textContent = next[1];
         if (step >= loadingStates.length - 1) window.clearInterval(interval);
       }, 900);
-      timeout = window.setTimeout(() => controller.abort(), 35000);
 
-      try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          body: new FormData(form),
-          signal: controller.signal,
-          headers: { Accept: 'text/html' },
-          credentials: 'same-origin',
-        });
-        if (!response.ok) {
-          throw new Error(response.status === 504
-            ? 'AI generation is taking too long. Please try again.'
-            : 'We could not generate your plan. Please try again.');
+      window.setTimeout(() => {
+        if (!document.hidden && !loadingOverlay.hidden) {
+          window.clearInterval(interval);
+          loadingOverlay.hidden = true;
+          showToast('AI generation is taking too long. Please try again.');
         }
-        window.location.assign(response.url);
-      } catch (error) {
-        showToast(error.name === 'AbortError'
-          ? 'AI generation is taking too long. Please try again.'
-          : error.message);
-      } finally {
-        window.clearTimeout(timeout);
-        window.clearInterval(interval);
-        loadingOverlay.hidden = true;
-      }
+      }, 35000);
     });
   });
 
