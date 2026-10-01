@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.core.config import Settings
-from app.schemas.ai import AIGenerationPayload, AIPlanOnlyPayload
+from app.schemas.ai import AIPlanOnlyPayload
 from app.schemas.user import UserInput
 from app.schemas.workout import WorkoutPlanData
 from app.services.gemini_service import GeminiService
@@ -27,7 +27,7 @@ class WorkoutService:
         payload = self.gemini.generate_structured(
             model=self.settings.default_workout_model,
             prompt=self._workout_prompt(user, "Focus on fitness guidance appropriate for the supplied goal and intensity."),
-            schema=AIGenerationPayload,
+            schema=AIPlanOnlyPayload,
         )
         return payload.plan
 

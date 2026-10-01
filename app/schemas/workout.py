@@ -1,13 +1,27 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class WorkoutExercise(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     sets: int = Field(ge=0, le=20)
-    reps: int | None = Field(default=None, ge=0, le=100)
-    duration_minutes: int | None = Field(default=None, ge=0, le=180)
-    rest_seconds: int = Field(ge=0, le=600)
+    reps: int | str | None = Field(default=None)
+    duration_minutes: int | str | None = Field(default=None)
+    rest_seconds: int | str = Field(default=60)
     notes: str = Field(default="", max_length=240)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_input(cls, value):
+        if isinstance(value, dict):
+            data = dict(value)
+            if "rest_seconds" not in data and "rest" in data:
+                data["rest_seconds"] = data.pop("rest")
+            if "rest_seconds" not in data and "interval" in data:
+                data["rest_seconds"] = data.pop("interval")
+            if "duration_minutes" not in data and "duration" in data:
+                data["duration_minutes"] = data.pop("duration")
+            return data
+        return value
 
 
 class WorkoutDay(BaseModel):
@@ -16,7 +30,21 @@ class WorkoutDay(BaseModel):
     warmup: list[str] = Field(min_length=1)
     exercises: list[WorkoutExercise] = Field(min_length=1)
     cooldown: list[str] = Field(min_length=1)
-    recovery_tip: str = Field(min_length=1, max_length=240)
+    recovery_tip: str = Field(default="Hydrate well, sleep 7-8 hours, and keep recovery active.", max_length=240)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_day(cls, value):
+        if isinstance(value, dict):
+            data = dict(value)
+            if isinstance(data.get("warmup"), str):
+                data["warmup"] = [item.strip() for item in data["warmup"].replace(" and ", ",").split(",") if item.strip()]
+            if isinstance(data.get("cooldown"), str):
+                data["cooldown"] = [item.strip() for item in data["cooldown"].replace(" and ", ",").split(",") if item.strip()]
+            if "recovery_tip" not in data:
+                data["recovery_tip"] = data.get("tip") or data.get("recovery") or "Hydrate well, sleep 7-8 hours, and keep recovery active."
+            return data
+        return value
 
 
 class WorkoutPlanData(BaseModel):

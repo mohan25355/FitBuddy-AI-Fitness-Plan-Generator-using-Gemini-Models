@@ -23,11 +23,11 @@ class Settings(BaseSettings):
 
     @property
     def default_workout_model(self) -> str:
-        return self.gemini_workout_model or "gemini-2.0-flash"
+        return self.gemini_workout_model or "gemini-flash-lite-latest"
 
     @property
     def default_fast_model(self) -> str:
-        return self.gemini_fast_model or "gemini-2.0-flash-lite"
+        return self.gemini_fast_model or "gemini-flash-lite-latest"
 
 
 @lru_cache(maxsize=1)

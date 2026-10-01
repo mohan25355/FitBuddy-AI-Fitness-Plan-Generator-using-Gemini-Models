@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import asynccontextmanager
 import json
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
@@ -44,6 +45,12 @@ from app.services.nutrition_service import NutritionService
 from app.services.workout_service import WorkoutService
 
 
+@asynccontextmanager
+async def app_lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     configure_logging()
     settings = settings or get_settings()
@@ -52,6 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         version=settings.app_version,
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=app_lifespan,
     )
     app.state.settings = settings
     app.state.gemini_service = GeminiService(settings)
@@ -73,10 +81,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.templates = templates
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-    @app.on_event("startup")
-    def startup() -> None:
-        init_db()
-
     @app.middleware("http")
     async def add_security_headers(request: Request, call_next: Callable):
         response = await call_next(request)
@@ -90,10 +94,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
         if request.headers.get("accept", "").startswith("application/json"):
             return JSONResponse(status_code=422, content={"detail": "Invalid request data."})
-            return templates.TemplateResponse(
-                request,
-                "error.html",
-                {"title": "Validation Error", "message": "Please review the form fields and try again."},
+        return templates.TemplateResponse(
+            request,
+            "error.html",
+            {"title": "Validation Error", "message": "Please review the form fields and try again."},
             status_code=422,
         )
 
@@ -101,10 +105,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def gemini_exception_handler(request: Request, exc: GeminiServiceError):
         if request.headers.get("accept", "").startswith("application/json"):
             return JSONResponse(status_code=503, content={"detail": str(exc)})
-            return templates.TemplateResponse(
-                request,
-                "error.html",
-                {"title": "AI Service Unavailable", "message": str(exc)},
+        return templates.TemplateResponse(
+            request,
+            "error.html",
+            {"title": "AI Service Unavailable", "message": str(exc)},
             status_code=503,
         )
 
@@ -113,10 +117,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         logger.exception("Unhandled application error")
         if request.headers.get("accept", "").startswith("application/json"):
             return JSONResponse(status_code=500, content={"detail": "Something went wrong. Please try again."})
-            return templates.TemplateResponse(
-                request,
-                "error.html",
-                {"title": "Unexpected Error", "message": "Something went wrong. Please try again."},
+        return templates.TemplateResponse(
+            request,
+            "error.html",
+            {"title": "Unexpected Error", "message": "Something went wrong. Please try again."},
             status_code=500,
         )
 
@@ -186,9 +190,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         latest_plan = get_latest_plan_for_user(db, user)
         completed_count = len((current_plan.completion_state or {}).get("completed_days", [])) if current_plan else 0
         return templates.TemplateResponse(
-                request,
-                "dashboard.html",
-                get_templates_context(
+            request,
+            "dashboard.html",
+            get_templates_context(
                 request,
                 title=f"FitBuddy - {user.name}",
                 user=serialize_user(user),
@@ -205,17 +209,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def feedback_page(request: Request, user_id: str, db: Session = Depends(get_db)):
         user = get_user_or_404(db, user_id)
         return templates.TemplateResponse(
-              request,
-              "feedback.html",
-              get_templates_context(request, title="Feedback - FitBuddy", user=serialize_user(user)),
+            request,
+            "feedback.html",
+            get_templates_context(request, title="Feedback - FitBuddy", user=serialize_user(user)),
         )
 
     @app.get("/", response_class=HTMLResponse, tags=["Health"])
     def home(request: Request):
         return templates.TemplateResponse(
-              request,
-              "index.html",
-              get_templates_context(request, title="FitBuddy - AI Fitness Plan Generator"),
+            request,
+            "index.html",
+            get_templates_context(request, title="FitBuddy - AI Fitness Plan Generator"),
         )
 
     @app.get("/health", tags=["Health"])
@@ -225,9 +229,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/onboarding", response_class=HTMLResponse, tags=["Users"])
     def onboarding(request: Request):
         return templates.TemplateResponse(
-              request,
-              "onboarding.html",
-              get_templates_context(request, title="Get Started - FitBuddy"),
+            request,
+            "onboarding.html",
+            get_templates_context(request, title="Get Started - FitBuddy"),
         )
 
     @app.post("/generate-workout", response_class=HTMLResponse, tags=["Workouts"])
@@ -276,9 +280,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         plan = get_plan_or_404(db, plan_id)
         user = plan.user
         return templates.TemplateResponse(
-                request,
-                "workout.html",
-                get_templates_context(
+            request,
+            "workout.html",
+            get_templates_context(
                 request,
                 title=f"Workout Plan v{plan.version} - FitBuddy",
                 user=serialize_user(user),
@@ -293,9 +297,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         user = get_user_or_404(db, user_id)
         history_items = get_history_with_feedback(db, user)
         return templates.TemplateResponse(
-              request,
-              "history.html",
-              get_templates_context(request, title="Plan History - FitBuddy", user=serialize_user(user), history=[{"plan": serialize_plan(plan), "feedback": feedback.feedback_text if feedback else None} for plan, feedback in history_items]),
+            request,
+            "history.html",
+            get_templates_context(request, title="Plan History - FitBuddy", user=serialize_user(user), history=[{"plan": serialize_plan(plan), "feedback": feedback.feedback_text if feedback else None} for plan, feedback in history_items]),
         )
 
     @app.post("/submit-feedback", response_class=HTMLResponse, tags=["Feedback"])
@@ -337,9 +341,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return RedirectResponse(url="/admin/login", status_code=303)
         users = list_users(db)
         return templates.TemplateResponse(
-                request,
-                "admin.html",
-                get_templates_context(
+            request,
+            "admin.html",
+            get_templates_context(
                 request,
                 title="Admin Dashboard - FitBuddy",
                 total_users=count_users(db),

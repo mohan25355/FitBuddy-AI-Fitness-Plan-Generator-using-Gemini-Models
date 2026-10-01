@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.core.config import Settings
-from app.schemas.ai import AIUpdateResponse
+from app.schemas.ai import AIPlanFlexiblePayload
 from app.schemas.feedback import FeedbackRequest
 from app.schemas.user import UserInput
 from app.schemas.workout import WorkoutPlanData
@@ -32,6 +32,6 @@ class FeedbackService:
         payload = self.gemini.generate_structured(
             model=self.settings.default_workout_model,
             prompt=prompt,
-            schema=AIUpdateResponse,
+            schema=AIPlanFlexiblePayload,
         )
         return payload.plan

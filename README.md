@@ -70,6 +70,7 @@ Required variables:
 - Use the current `google-genai` SDK.
 - Set `GEMINI_API_KEY` in `.env`.
 - Set model names with environment variables so the code does not hardcode Gemini models.
+- The verified local configuration in this workspace uses `gemini-flash-lite-latest` for both workout generation and fast nutrition or recovery responses.
 
 ## Database Setup
 
