@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     admin_password_hash: str = Field(default="", alias="ADMIN_PASSWORD_HASH")
     csrf_cookie_name: str = "fitbuddy_csrf"
     session_cookie_name: str = "fitbuddy_session"
-    request_timeout_seconds: int = 30
+    request_timeout_seconds: int = Field(default=30, alias="REQUEST_TIMEOUT_SECONDS", ge=5, le=120)
 
     @property
     def default_workout_model(self) -> str:

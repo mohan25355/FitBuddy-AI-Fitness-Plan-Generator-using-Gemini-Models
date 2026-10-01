@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any, TypeVar
 
+import httpx
 from google import genai
 from google.genai import errors as genai_errors
 from google.genai import types
@@ -19,10 +20,21 @@ class GeminiServiceError(RuntimeError):
     pass
 
 
+class GeminiServiceTimeout(GeminiServiceError):
+    pass
+
+
 class GeminiService:
     def __init__(self, settings: Settings):
         self.settings = settings
-        self.client = genai.Client(api_key=settings.gemini_api_key) if settings.gemini_api_key else None
+        self.client = (
+            genai.Client(
+                api_key=settings.gemini_api_key,
+                http_options=types.HttpOptions(timeout=settings.request_timeout_seconds * 1000),
+            )
+            if settings.gemini_api_key
+            else None
+        )
 
     def _ensure_client(self) -> genai.Client:
         if not self.client:
@@ -42,6 +54,8 @@ class GeminiService:
                 ),
             )
             return (response.text or "").strip()
+        except (httpx.TimeoutException, TimeoutError) as error:
+            raise GeminiServiceTimeout("AI generation is taking too long. Please try again.") from error
         except genai_errors.APIError as error:
             raise GeminiServiceError("Gemini request failed. Please try again shortly.") from error
         except Exception as error:
@@ -72,6 +86,8 @@ class GeminiService:
                 ),
             )
             repaired = (response.text or "").strip()
+        except (httpx.TimeoutException, TimeoutError) as error:
+            raise GeminiServiceTimeout("AI generation is taking too long. Please try again.") from error
         except genai_errors.APIError as error:
             raise GeminiServiceError("Gemini request failed. Please try again shortly.") from error
         except Exception as error:
@@ -102,6 +118,8 @@ class GeminiService:
             )
             repaired = (response.text or "").strip()
             return json.loads(repaired)
+        except (httpx.TimeoutException, TimeoutError) as error:
+            raise GeminiServiceTimeout("AI generation is taking too long. Please try again.") from error
         except (genai_errors.APIError, json.JSONDecodeError, Exception) as error:
             raise GeminiServiceError("Generated data did not match the required schema.") from error
 

@@ -40,7 +40,7 @@ from app.schemas.feedback import FeedbackRequest
 from app.schemas.user import UserInput
 from app.schemas.workout import WorkoutPlanData
 from app.services.feedback_service import FeedbackService
-from app.services.gemini_service import GeminiService, GeminiServiceError
+from app.services.gemini_service import GeminiService, GeminiServiceError, GeminiServiceTimeout
 from app.services.nutrition_service import NutritionService
 from app.services.workout_service import WorkoutService
 
@@ -110,6 +110,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "error.html",
             {"title": "AI Service Unavailable", "message": str(exc)},
             status_code=503,
+        )
+
+    @app.exception_handler(GeminiServiceTimeout)
+    async def gemini_timeout_handler(request: Request, exc: GeminiServiceTimeout):
+        if request.headers.get("accept", "").startswith("application/json"):
+            return JSONResponse(status_code=504, content={"detail": str(exc)})
+        return templates.TemplateResponse(
+            request,
+            "error.html",
+            {"title": "AI Request Timed Out", "message": str(exc)},
+            status_code=504,
         )
 
     @app.exception_handler(Exception)
