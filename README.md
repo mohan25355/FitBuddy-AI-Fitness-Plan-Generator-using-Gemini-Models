@@ -127,3 +127,8 @@ Tests mock the AI behavior and verify validation, duplicate user IDs, persistenc
 - If Gemini calls fail, confirm the API key and model names are set.
 - If the admin dashboard is inaccessible, confirm `ADMIN_PASSWORD_HASH` is populated.
 - If SQLite permissions fail, verify the working directory is writable.
+
+## run command
+.\.venv\Scripts\Activate.ps1
+
+python run.py
